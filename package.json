@@ -166,10 +166,9 @@
         "deepseek.model": {
           "type": "string",
           "default": "deepseek-chat",
-          "description": "Модель DeepSeek",
+          "description": "Модель DeepSeek (только deepseek-chat)",
           "enum": [
-            "deepseek-chat",
-            "deepseek-coder"
+            "deepseek-chat"
           ]
         },
         "deepseek.maxTokens": {

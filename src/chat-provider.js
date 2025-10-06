@@ -257,26 +257,58 @@ class DeepSeekChatProvider {
                 }
                 
                 .message {
-                    max-width: 90%;
-                    padding: 12px 16px;
-                    border-radius: 12px;
-                    line-height: 1.5;
-                    word-wrap: break-word;
-                    position: relative;
+                    max-width: 85%;
+                    margin-bottom: 20px;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 12px;
                 }
                 
                 .user-message {
-                    align-self: flex-end;
-                    background: var(--vscode-button-background);
-                    color: var(--vscode-button-foreground);
-                    border-bottom-right-radius: 4px;
+                    flex-direction: row-reverse;
                 }
                 
                 .assistant-message {
-                    align-self: flex-start;
+                    flex-direction: row;
+                }
+                
+                .message-avatar {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+                
+                .user-message .message-avatar {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                }
+                
+                .assistant-message .message-avatar {
+                    background: linear-gradient(135deg, #00D4AA 0%, #00A8CC 100%);
+                    color: white;
+                }
+                
+                .message-content {
                     background: var(--vscode-input-background);
                     border: 1px solid var(--vscode-input-border);
-                    border-bottom-left-radius: 4px;
+                    border-radius: 12px;
+                    padding: 12px 16px;
+                    line-height: 1.6;
+                    word-wrap: break-word;
+                    position: relative;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+                
+                .user-message .message-content {
+                    background: var(--vscode-button-background);
+                    color: var(--vscode-button-foreground);
+                    border-color: var(--vscode-button-border);
                 }
                 
                 .message-header {
@@ -437,8 +469,14 @@ class DeepSeekChatProvider {
         <body>
             <div class="chat-container">
                 <div class="chat-header">
-                    <div class="header-title">💬 DeepSeek Чат</div>
-                    <button class="btn btn-secondary" id="clearBtn">Очистить чат</button>
+                    <div class="header-title">
+                        <div class="header-icon">🤖</div>
+                        <div class="header-text">
+                            <div class="header-main">DeepSeek Chat</div>
+                            <div class="header-sub">AI-помощник для программирования</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" id="clearBtn">🗑️ Очистить</button>
                 </div>
                 
                 <div class="chat-messages" id="chatMessages">
@@ -515,19 +553,30 @@ class DeepSeekChatProvider {
                         const messageDiv = document.createElement('div');
                         messageDiv.className = \`message \${msg.role === 'user' ? 'user-message' : 'assistant-message'}\`;
                         
-                        const headerDiv = document.createElement('div');
-                        headerDiv.className = 'message-header';
-                        headerDiv.innerHTML = \`
-                            <strong>\${msg.role === 'user' ? 'Вы' : 'DeepSeek'}</strong>
-                            <span>\${msg.timestamp || ''}</span>
-                        \`;
+                        // Аватар
+                        const avatarDiv = document.createElement('div');
+                        avatarDiv.className = 'message-avatar';
+                        avatarDiv.textContent = msg.role === 'user' ? 'В' : 'D';
                         
+                        // Контент сообщения
                         const contentDiv = document.createElement('div');
                         contentDiv.className = 'message-content';
                         contentDiv.innerHTML = formatMessage(msg.content);
                         
-                        messageDiv.appendChild(headerDiv);
-                        messageDiv.appendChild(contentDiv);
+                        // Время
+                        const timeDiv = document.createElement('div');
+                        timeDiv.style.fontSize = '11px';
+                        timeDiv.style.color = 'var(--vscode-descriptionForeground)';
+                        timeDiv.style.marginTop = '4px';
+                        timeDiv.textContent = msg.timestamp || '';
+                        
+                        const contentWrapper = document.createElement('div');
+                        contentWrapper.style.flex = '1';
+                        contentWrapper.appendChild(contentDiv);
+                        contentWrapper.appendChild(timeDiv);
+                        
+                        messageDiv.appendChild(avatarDiv);
+                        messageDiv.appendChild(contentWrapper);
                         
                         // Добавляем кнопки для кодовых блоков
                         const codeBlocks = contentDiv.querySelectorAll('pre');
