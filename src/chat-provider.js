@@ -477,9 +477,38 @@ class DeepSeekChatProvider {
                     line-height: 1.6;
                 }
                 
+                .empty-icon {
+                    font-size: 48px;
+                    margin-bottom: 16px;
+                }
+                
                 .empty-state h3 {
-                    margin-bottom: 8px;
+                    margin-bottom: 16px;
                     color: var(--vscode-foreground);
+                    font-size: 18px;
+                }
+                
+                .features-list {
+                    text-align: left;
+                    max-width: 300px;
+                    margin: 16px auto;
+                    padding: 0;
+                    list-style: none;
+                }
+                
+                .features-list li {
+                    padding: 8px 0;
+                    border-bottom: 1px solid var(--vscode-panel-border);
+                }
+                
+                .features-list li:last-child {
+                    border-bottom: none;
+                }
+                
+                .start-hint {
+                    margin-top: 20px;
+                    font-style: italic;
+                    color: var(--vscode-textLink-foreground);
                 }
                 
                 .status-info {
@@ -563,9 +592,17 @@ class DeepSeekChatProvider {
                     if (history.length === 0) {
                         chatMessages.innerHTML = \`
                             <div class="empty-state">
+                                <div class="empty-icon">🤖</div>
                                 <h3>Добро пожаловать в DeepSeek Chat!</h3>
-                                <p>Я ваш AI-помощник для программирования.</p>
-                                <p>Задавайте вопросы, обсуждайте код, или используйте команды из контекстного меню.</p>
+                                <p>Я ваш AI-помощник для программирования. Могу помочь с:</p>
+                                <ul class="features-list">
+                                    <li>📖 Объяснением кода</li>
+                                    <li>✨ Генерацией кода</li>
+                                    <li>🔧 Рефакторингом</li>
+                                    <li>🐛 Отладкой</li>
+                                    <li>📝 Документацией</li>
+                                </ul>
+                                <p class="start-hint">Начните общение, задав вопрос или выделив код!</p>
                             </div>
                         \`;
                         return;
