@@ -1,0 +1,17 @@
+deepseek-vscode
+├─ deepseek-chat-1.0.4.vsix
+├─ extension.js
+├─ media
+│  └─ images.png
+├─ package-lock.json
+├─ package.json
+├─ src
+│  ├─ chat-provider.js
+│  ├─ code-assistant.js
+│  └─ deepseek-client.js
+├─ structure.txt
+└─ versions-old
+   ├─ deepseek-chat-1.0.0.vsix
+   ├─ deepseek-chat-1.0.1.vsix
+   ├─ deepseek-chat-1.0.2.vsix
+   └─ deepseek-chat-1.0.3.vsix

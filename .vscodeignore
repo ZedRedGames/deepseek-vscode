@@ -1,0 +1,28 @@
+# Файлы разработки и системы
+.vscode/**
+.git/**
+.github/**
+node_modules/**
+*.log
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+
+# Исходные файлы и документация (не нужны в пакете)
+src/**/*.test.js
+*.map
+*.ts
+tsconfig.json
+.eslintrc.json
+.prettierrc
+
+# Старые версии и временные файлы
+versions-old/**
+*.vsix
+structure.txt
+
+# Документация (уже есть в README.md)
+SECURITY.md
+
+# Lock файлы (не нужны в финальном пакете)
+package-lock.jsonА

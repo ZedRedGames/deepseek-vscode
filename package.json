@@ -1,0 +1,195 @@
+{
+  "name": "deepseek-chat",
+  "displayName": "DeepSeek Chat - Русская версия",
+  "description": "Продвинутый AI-помощник DeepSeek для VS Code",
+  "version": "1.0.7",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZedRedGames/deepseek-vscode.git"
+  },
+  "publisher": "ZedRedGames",
+  "categories": [
+    "Machine Learning",
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:deepseek.openChat",
+    "onCommand:deepseek.quickChat",
+    "onCommand:deepseek.explainCode",
+    "onCommand:deepseek.generateCode",
+    "onCommand:deepseek.refactorCode",
+    "onCommand:deepseek.debugCode",
+    "onCommand:deepseek.optimizeCode",
+    "onCommand:deepseek.documentCode",
+    "onCommand:deepseek.translateCode",
+    "onView:deepseek-chat-view"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "deepseek.openChat",
+        "title": "DeepSeek: Открыть чат панель",
+        "category": "AI"
+      },
+      {
+        "command": "deepseek.quickChat",
+        "title": "DeepSeek: Быстрый чат",
+        "category": "AI"
+      },
+      {
+        "command": "deepseek.explainCode",
+        "title": "DeepSeek: Объяснить код",
+        "category": "AI"
+      },
+      {
+        "command": "deepseek.generateCode",
+        "title": "DeepSeek: Сгенерировать код",
+        "category": "AI"
+      },
+      {
+        "command": "deepseek.refactorCode",
+        "title": "DeepSeek: Рефакторить код",
+        "category": "AI"
+      },
+      {
+        "command": "deepseek.debugCode",
+        "title": "DeepSeek: Найти ошибки",
+        "category": "AI"
+      },
+      {
+        "command": "deepseek.optimizeCode",
+        "title": "DeepSeek: Оптимизировать код",
+        "category": "AI"
+      },
+      {
+        "command": "deepseek.documentCode",
+        "title": "DeepSeek: Документировать код",
+        "category": "AI"
+      },
+      {
+        "command": "deepseek.translateCode",
+        "title": "DeepSeek: Перевести код",
+        "category": "AI"
+      }
+    ],
+    "menus": {
+      "command-palette": [
+        {
+          "command": "deepseek.openChat",
+          "when": "true"
+        },
+        {
+          "command": "deepseek.quickChat",
+          "when": "true"
+        },
+        {
+          "command": "deepseek.explainCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "deepseek.refactorCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "deepseek.debugCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "deepseek.optimizeCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "deepseek.documentCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "deepseek.translateCode",
+          "when": "editorHasSelection"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "deepseek.explainCode",
+          "when": "editorHasSelection",
+          "group": "AI@1"
+        },
+        {
+          "command": "deepseek.refactorCode",
+          "when": "editorHasSelection",
+          "group": "AI@2"
+        },
+        {
+          "command": "deepseek.debugCode",
+          "when": "editorHasSelection",
+          "group": "AI@3"
+        },
+        {
+          "command": "deepseek.optimizeCode",
+          "when": "editorHasSelection",
+          "group": "AI@4"
+        },
+        {
+          "command": "deepseek.documentCode",
+          "when": "editorHasSelection",
+          "group": "AI@5"
+        },
+        {
+          "command": "deepseek.translateCode",
+          "when": "editorHasSelection",
+          "group": "AI@6"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "deepseek-chat-view",
+          "name": "DeepSeek Chat",
+          "when": "true"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "DeepSeek",
+      "properties": {
+        "deepseek.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API ключ DeepSeek"
+        },
+        "deepseek.model": {
+          "type": "string",
+          "default": "deepseek-chat",
+          "description": "Модель DeepSeek",
+          "enum": [
+            "deepseek-chat",
+            "deepseek-coder"
+          ]
+        },
+        "deepseek.maxTokens": {
+          "type": "number",
+          "default": 4000,
+          "description": "Максимальное количество токенов"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "echo Компиляция...",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^2.24.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.0"
+  }
+}
