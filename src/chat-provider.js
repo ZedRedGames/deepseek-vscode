@@ -220,7 +220,7 @@ class DeepSeekChatProvider {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>DeepSeek Чат</title>
+            <title>DeepSeek Chat</title>
             <style>
                 * {
                     margin: 0;
@@ -229,13 +229,14 @@ class DeepSeekChatProvider {
                 }
                 
                 body {
-                    font-family: var(--vscode-font-family);
-                    background: var(--vscode-editor-background);
-                    color: var(--vscode-editor-foreground);
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: #f6f8fa;
+                    color: #24292f;
                     height: 100vh;
                     display: flex;
                     flex-direction: column;
-                    font-size: 13px;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
                 
                 .chat-container {
@@ -243,15 +244,19 @@ class DeepSeekChatProvider {
                     display: flex;
                     flex-direction: column;
                     height: 100%;
+                    background: #ffffff;
                 }
                 
                 .chat-header {
-                    padding: 12px 16px;
-                    background: var(--vscode-titleBar-activeBackground);
-                    border-bottom: 1px solid var(--vscode-panel-border);
+                    padding: 16px 20px;
+                    background: #ffffff;
+                    border-bottom: 1px solid #d0d7de;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
+                    position: sticky;
+                    top: 0;
+                    z-index: 10;
                 }
                 
                 .header-title {
@@ -261,7 +266,15 @@ class DeepSeekChatProvider {
                 }
                 
                 .header-icon {
-                    font-size: 20px;
+                    width: 32px;
+                    height: 32px;
+                    background: linear-gradient(135deg, #00D4AA 0%, #00A8CC 100%);
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 16px;
+                    color: white;
                 }
                 
                 .header-text {
@@ -271,39 +284,42 @@ class DeepSeekChatProvider {
                 
                 .header-main {
                     font-weight: 600;
-                    font-size: 14px;
-                    color: var(--vscode-foreground);
+                    font-size: 16px;
+                    color: #24292f;
                 }
                 
                 .header-sub {
-                    font-size: 11px;
-                    color: var(--vscode-descriptionForeground);
+                    font-size: 12px;
+                    color: #656d76;
                     margin-top: 2px;
                 }
                 
                 .chat-messages {
                     flex: 1;
                     overflow-y: auto;
-                    padding: 16px;
+                    padding: 0;
                     display: flex;
                     flex-direction: column;
-                    gap: 16px;
                 }
                 
                 .message {
-                    max-width: 85%;
-                    margin-bottom: 20px;
+                    padding: 16px 20px;
+                    border-bottom: 1px solid #f1f3f4;
                     display: flex;
                     align-items: flex-start;
                     gap: 12px;
                 }
                 
+                .message:last-child {
+                    border-bottom: none;
+                }
+                
                 .user-message {
-                    flex-direction: row-reverse;
+                    background: #f6f8fa;
                 }
                 
                 .assistant-message {
-                    flex-direction: row;
+                    background: #ffffff;
                 }
                 
                 .message-avatar {
@@ -315,11 +331,13 @@ class DeepSeekChatProvider {
                     align-items: center;
                     justify-content: center;
                     font-size: 14px;
-                    font-weight: bold;
+                    font-weight: 600;
+                    border: 2px solid #ffffff;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
                 }
                 
                 .user-message .message-avatar {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: #0969da;
                     color: white;
                 }
                 
@@ -329,20 +347,17 @@ class DeepSeekChatProvider {
                 }
                 
                 .message-content {
-                    background: var(--vscode-input-background);
-                    border: 1px solid var(--vscode-input-border);
-                    border-radius: 12px;
-                    padding: 12px 16px;
+                    flex: 1;
                     line-height: 1.6;
                     word-wrap: break-word;
-                    position: relative;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
                 }
                 
-                .user-message .message-content {
-                    background: var(--vscode-button-background);
-                    color: var(--vscode-button-foreground);
-                    border-color: var(--vscode-button-border);
+                .message-content p {
+                    margin: 0 0 8px 0;
+                }
+                
+                .message-content p:last-child {
+                    margin-bottom: 0;
                 }
                 
                 .message-header {
@@ -359,25 +374,30 @@ class DeepSeekChatProvider {
                 }
                 
                 .message-content code {
-                    background: var(--vscode-textCodeBlock-background);
+                    background: #f1f3f4;
                     padding: 2px 6px;
                     border-radius: 4px;
-                    font-family: var(--vscode-editor-font-family);
-                    font-size: 12px;
+                    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+                    font-size: 13px;
+                    color: #24292f;
                 }
                 
                 .message-content pre {
-                    background: var(--vscode-textCodeBlock-background);
-                    padding: 12px;
-                    border-radius: 6px;
+                    background: #f6f8fa;
+                    padding: 16px;
+                    border-radius: 8px;
                     overflow-x: auto;
-                    margin: 8px 0;
-                    border: 1px solid var(--vscode-panel-border);
+                    margin: 12px 0;
+                    border: 1px solid #d0d7de;
+                    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+                    font-size: 13px;
+                    line-height: 1.45;
                 }
                 
                 .message-content pre code {
                     background: none;
                     padding: 0;
+                    color: #24292f;
                 }
                 
                 .code-actions {
@@ -401,27 +421,32 @@ class DeepSeekChatProvider {
                 }
                 
                 .chat-input-container {
-                    padding: 16px;
-                    border-top: 1px solid var(--vscode-panel-border);
-                    background: var(--vscode-editor-background);
+                    padding: 16px 20px;
+                    border-top: 1px solid #d0d7de;
+                    background: #ffffff;
+                    position: sticky;
+                    bottom: 0;
                 }
                 
                 .chat-input {
                     width: 100%;
-                    padding: 10px 12px;
-                    background: var(--vscode-input-background);
-                    border: 1px solid var(--vscode-input-border);
-                    color: var(--vscode-input-foreground);
-                    border-radius: 6px;
+                    padding: 12px 16px;
+                    background: #ffffff;
+                    border: 1px solid #d0d7de;
+                    color: #24292f;
+                    border-radius: 8px;
                     resize: none;
                     font-family: inherit;
-                    font-size: 13px;
-                    line-height: 1.4;
+                    font-size: 14px;
+                    line-height: 1.5;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    transition: border-color 0.2s ease;
                 }
                 
                 .chat-input:focus {
                     outline: none;
-                    border-color: var(--vscode-focusBorder);
+                    border-color: #0969da;
+                    box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
                 }
                 
                 .chat-controls {
@@ -433,27 +458,35 @@ class DeepSeekChatProvider {
                 }
                 
                 .btn {
-                    padding: 6px 12px;
-                    background: var(--vscode-button-background);
-                    color: var(--vscode-button-foreground);
+                    padding: 8px 16px;
+                    background: #0969da;
+                    color: #ffffff;
                     border: none;
-                    border-radius: 4px;
+                    border-radius: 6px;
                     cursor: pointer;
-                    font-size: 12px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    transition: background-color 0.2s ease;
                 }
                 
                 .btn:hover {
-                    background: var(--vscode-button-hoverBackground);
+                    background: #0860ca;
                 }
                 
                 .btn:disabled {
                     opacity: 0.6;
                     cursor: not-allowed;
+                    background: #8b949e;
                 }
                 
                 .btn-secondary {
-                    background: transparent;
-                    border: 1px solid var(--vscode-button-border);
+                    background: #ffffff;
+                    color: #24292f;
+                    border: 1px solid #d0d7de;
+                }
+                
+                .btn-secondary:hover {
+                    background: #f6f8fa;
                 }
                 
                 .typing-indicator {
@@ -484,43 +517,63 @@ class DeepSeekChatProvider {
                 
                 .empty-state {
                     text-align: center;
-                    color: var(--vscode-descriptionForeground);
+                    color: #656d76;
                     padding: 40px 20px;
                     line-height: 1.6;
                 }
                 
                 .empty-icon {
-                    font-size: 48px;
-                    margin-bottom: 16px;
+                    width: 64px;
+                    height: 64px;
+                    background: linear-gradient(135deg, #00D4AA 0%, #00A8CC 100%);
+                    border-radius: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    color: white;
+                    margin: 0 auto 20px;
                 }
                 
                 .empty-state h3 {
                     margin-bottom: 16px;
-                    color: var(--vscode-foreground);
-                    font-size: 18px;
+                    color: #24292f;
+                    font-size: 20px;
+                    font-weight: 600;
                 }
                 
-                .features-list {
-                    text-align: left;
-                    max-width: 300px;
-                    margin: 16px auto;
-                    padding: 0;
-                    list-style: none;
+                .features-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 12px;
+                    max-width: 400px;
+                    margin: 20px auto;
                 }
                 
-                .features-list li {
-                    padding: 8px 0;
-                    border-bottom: 1px solid var(--vscode-panel-border);
+                .feature-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px;
+                    background: #f6f8fa;
+                    border-radius: 8px;
+                    border: 1px solid #d0d7de;
                 }
                 
-                .features-list li:last-child {
-                    border-bottom: none;
+                .feature-icon {
+                    font-size: 16px;
+                }
+                
+                .feature-text {
+                    font-size: 14px;
+                    color: #24292f;
                 }
                 
                 .start-hint {
-                    margin-top: 20px;
+                    margin-top: 24px;
                     font-style: italic;
-                    color: var(--vscode-textLink-foreground);
+                    color: #0969da;
+                    font-size: 14px;
                 }
                 
                 .status-info {
@@ -533,13 +586,13 @@ class DeepSeekChatProvider {
             <div class="chat-container">
                 <div class="chat-header">
                     <div class="header-title">
-                        <div class="header-icon">🤖</div>
+                        <div class="header-icon">D</div>
                         <div class="header-text">
                             <div class="header-main">DeepSeek Chat</div>
                             <div class="header-sub">AI-помощник для программирования</div>
                         </div>
                     </div>
-                    <button class="btn btn-secondary" id="clearBtn">🗑️ Очистить</button>
+                    <button class="btn btn-secondary" id="clearBtn">Очистить</button>
                 </div>
                 
                 <div class="chat-messages" id="chatMessages">
@@ -604,16 +657,27 @@ class DeepSeekChatProvider {
                     if (history.length === 0) {
                         chatMessages.innerHTML = \`
                             <div class="empty-state">
-                                <div class="empty-icon">🤖</div>
+                                <div class="empty-icon">D</div>
                                 <h3>Добро пожаловать в DeepSeek Chat!</h3>
                                 <p>Я ваш AI-помощник для программирования. Могу помочь с:</p>
-                                <ul class="features-list">
-                                    <li>📖 Объяснением кода</li>
-                                    <li>✨ Генерацией кода</li>
-                                    <li>🔧 Рефакторингом</li>
-                                    <li>🐛 Отладкой</li>
-                                    <li>📝 Документацией</li>
-                                </ul>
+                                <div class="features-grid">
+                                    <div class="feature-item">
+                                        <div class="feature-icon">📖</div>
+                                        <div class="feature-text">Объяснение кода</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <div class="feature-icon">✨</div>
+                                        <div class="feature-text">Генерация кода</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <div class="feature-icon">🔧</div>
+                                        <div class="feature-text">Рефакторинг</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <div class="feature-icon">🐛</div>
+                                        <div class="feature-text">Отладка</div>
+                                    </div>
+                                </div>
                                 <p class="start-hint">Начните общение, задав вопрос или выделив код!</p>
                             </div>
                         \`;
@@ -634,20 +698,8 @@ class DeepSeekChatProvider {
                         contentDiv.className = 'message-content';
                         contentDiv.innerHTML = formatMessage(msg.content);
                         
-                        // Время
-                        const timeDiv = document.createElement('div');
-                        timeDiv.style.fontSize = '11px';
-                        timeDiv.style.color = 'var(--vscode-descriptionForeground)';
-                        timeDiv.style.marginTop = '4px';
-                        timeDiv.textContent = msg.timestamp || '';
-                        
-                        const contentWrapper = document.createElement('div');
-                        contentWrapper.style.flex = '1';
-                        contentWrapper.appendChild(contentDiv);
-                        contentWrapper.appendChild(timeDiv);
-                        
                         messageDiv.appendChild(avatarDiv);
-                        messageDiv.appendChild(contentWrapper);
+                        messageDiv.appendChild(contentDiv);
                         
                         // Добавляем кнопки для кодовых блоков
                         const codeBlocks = contentDiv.querySelectorAll('pre');
