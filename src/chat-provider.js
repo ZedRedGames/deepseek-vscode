@@ -243,8 +243,30 @@ class DeepSeekChatProvider {
                 }
                 
                 .header-title {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+                
+                .header-icon {
+                    font-size: 20px;
+                }
+                
+                .header-text {
+                    display: flex;
+                    flex-direction: column;
+                }
+                
+                .header-main {
                     font-weight: 600;
-                    font-size: 13px;
+                    font-size: 14px;
+                    color: var(--vscode-foreground);
+                }
+                
+                .header-sub {
+                    font-size: 11px;
+                    color: var(--vscode-descriptionForeground);
+                    margin-top: 2px;
                 }
                 
                 .chat-messages {
