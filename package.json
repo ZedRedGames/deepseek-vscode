@@ -17,18 +17,6 @@
     "Machine Learning",
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:deepseek.openChat",
-    "onCommand:deepseek.quickChat",
-    "onCommand:deepseek.explainCode",
-    "onCommand:deepseek.generateCode",
-    "onCommand:deepseek.refactorCode",
-    "onCommand:deepseek.debugCode",
-    "onCommand:deepseek.optimizeCode",
-    "onCommand:deepseek.documentCode",
-    "onCommand:deepseek.translateCode",
-    "onView:deepseek-chat-view"
-  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
@@ -146,12 +134,20 @@
         }
       ]
     },
-    "views": {
+    "viewsContainers": {
       "activitybar": [
         {
+          "id": "deepseek-chat-container",
+          "title": "DeepSeek Chat",
+          "icon": "media/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "deepseek-chat-container": [
+        {
           "id": "deepseek-chat-view",
-          "name": "DeepSeek Chat",
-          "when": "true"
+          "name": "Чат AI"
         }
       ]
     },

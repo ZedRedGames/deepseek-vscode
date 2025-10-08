@@ -1,28 +1,34 @@
+// DeepSeekChatProvider — основной класс для интеграции AI-чата в VS Code
 const vscode = require('vscode');
-const axios = require('axios');
 const DeepSeekClient = require('./deepseek-client');
 
 class DeepSeekChatProvider {
     constructor() {
+        // Ссылка на webview-панель
         this._view = null;
+        // История сообщений чата
         this._conversationHistory = [];
+        // Флаг обработки сообщения
         this._isProcessing = false;
     }
-    
+
+    /**
+     * Инициализация webview-панели и обработка событий от webview
+     */
     resolveWebviewView(webviewView, context, _token) {
         this._view = webviewView;
-        
+
         webviewView.webview.options = {
             enableScripts: true,
             localResourceRoots: [
                 vscode.Uri.joinPath(context.extensionUri, 'media')
             ]
         };
-        
-        // Инициализируем HTML содержимое
+
+        // Устанавливаем HTML для webview
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-        
-        // Обработка сообщений из вебвью
+
+        // Обработка сообщений от webview (UI)
         webviewView.webview.onDidReceiveMessage(async data => {
             switch (data.type) {
                 case 'sendMessage':
@@ -38,25 +44,34 @@ class DeepSeekChatProvider {
             }
         });
     }
-    
+
+    /**
+     * Показывает панель чата, если она уже создана
+     */
     showChatPanel() {
         if (this._view) {
             this._view.show?.(true);
         }
     }
-    
+
+    /**
+     * Отправляет сообщение в чат и показывает панель
+     */
     async sendMessage(message) {
         if (this._view) {
             this._view.show?.(true);
             await this._handleUserMessage(message);
         }
     }
-    
+
+    /**
+     * Обрабатывает пользовательское сообщение: добавляет в историю, отправляет в AI, обновляет UI
+     */
     async _handleUserMessage(message) {
         if (!message.trim() || this._isProcessing) return;
-        
+
         this._isProcessing = true;
-        
+
         // Добавляем сообщение пользователя в историю
         this._conversationHistory.push({ 
             role: 'user', 
@@ -64,12 +79,12 @@ class DeepSeekChatProvider {
             timestamp: new Date().toLocaleTimeString('ru-RU')
         });
         this._updateWebview();
-        
+
         try {
             const config = vscode.workspace.getConfiguration('deepseek');
             const apiKey = config.get('apiKey');
             const model = config.get('model') || 'deepseek-chat';
-            
+
             if (!apiKey) {
                 this._conversationHistory.push({ 
                     role: 'assistant', 
@@ -79,21 +94,23 @@ class DeepSeekChatProvider {
                 this._updateWebview();
                 return;
             }
-            
+
             // Показываем индикатор набора
             this._showTypingIndicator();
-            
+
+            // Получаем ответ от AI
             const response = await this._getDeepSeekResponse(message, apiKey, model);
-            
+
             // Убираем индикатор набора
             this._hideTypingIndicator();
-            
+
+            // Добавляем ответ AI в историю
             this._conversationHistory.push({ 
                 role: 'assistant', 
                 content: response,
                 timestamp: new Date().toLocaleTimeString('ru-RU')
             });
-            
+
         } catch (error) {
             this._hideTypingIndicator();
             this._conversationHistory.push({ 
@@ -106,8 +123,12 @@ class DeepSeekChatProvider {
             this._updateWebview();
         }
     }
-    
+
+    /**
+     * Получает ответ от DeepSeek AI через DeepSeekClient
+     */
     async _getDeepSeekResponse(message, apiKey, model) {
+        // Системный промпт для AI
         const systemPrompt = `Ты DeepSeek AI помощник, интегрированный в VS Code. Ты помогаешь пользователям с программированием, объяснением кода, отладкой и общими вопросами.
 
 🤖 **Твоя роль:**
@@ -134,6 +155,7 @@ class DeepSeekChatProvider {
 - Структурируй ответы с заголовками
 - Предлагай дополнительные решения`;
 
+        // Формируем историю сообщений для AI
         const messages = [
             { role: 'system', content: systemPrompt },
             ...this._conversationHistory.slice(-8).map(msg => ({
@@ -143,10 +165,14 @@ class DeepSeekChatProvider {
             { role: 'user', content: message }
         ];
 
+        // Используем DeepSeekClient для общения с API
         const client = new DeepSeekClient(apiKey, model);
         return await client.chatCompletion(messages);
     }
-    
+
+    /**
+     * Показывает индикатор "AI печатает..." в UI
+     */
     _showTypingIndicator() {
         if (this._view) {
             this._view.webview.postMessage({
@@ -154,7 +180,10 @@ class DeepSeekChatProvider {
             });
         }
     }
-    
+
+    /**
+     * Скрывает индикатор "AI печатает..."
+     */
     _hideTypingIndicator() {
         if (this._view) {
             this._view.webview.postMessage({
@@ -162,13 +191,16 @@ class DeepSeekChatProvider {
             });
         }
     }
-    
+
+    /**
+     * Вставляет сгенерированный код в редактор VS Code
+     */
     async _insertCodeToEditor(code) {
         const editor = vscode.window.activeTextEditor;
         if (editor) {
-            // Извлекаем чистый код из markdown блоков если есть
+            // Извлекаем чистый код из markdown-блоков
             const cleanCode = code.replace(/```[\w]*\n?/g, '').replace(/```/g, '').trim();
-            
+
             await editor.edit(editBuilder => {
                 if (editor.selection.isEmpty) {
                     // Вставляем в текущую позицию курсора
@@ -179,13 +211,16 @@ class DeepSeekChatProvider {
                     editBuilder.replace(editor.selection, cleanCode);
                 }
             });
-            
+
             vscode.window.showInformationMessage('Код вставлен в редактор!');
         } else {
             vscode.window.showWarningMessage('Откройте файл для вставки кода');
         }
     }
-    
+
+    /**
+     * Обновляет UI webview с актуальной историей чата
+     */
     _updateWebview() {
         if (this._view) {
             this._view.webview.postMessage({
@@ -194,7 +229,10 @@ class DeepSeekChatProvider {
             });
         }
     }
-    
+
+    /**
+     * Генерирует HTML для webview (UI чата)
+     */
     _getHtmlForWebview(webview) {
         return `
         <!DOCTYPE html>
