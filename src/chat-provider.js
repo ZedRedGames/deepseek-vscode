@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const axios = require('axios');
+const DeepSeekClient = require('./deepseek-client');
 
 class DeepSeekChatProvider {
     constructor() {
@@ -107,16 +108,6 @@ class DeepSeekChatProvider {
     }
     
     async _getDeepSeekResponse(message, apiKey, model) {
-        const client = axios.create({
-            baseURL: 'https://api.deepseek.com/v1',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            },
-            timeout: 30000
-        });
-        
-        // Системный промпт на русском
         const systemPrompt = `Ты DeepSeek AI помощник, интегрированный в VS Code. Ты помогаешь пользователям с программированием, объяснением кода, отладкой и общими вопросами.
 
 🤖 **Твоя роль:**
@@ -144,25 +135,16 @@ class DeepSeekChatProvider {
 - Предлагай дополнительные решения`;
 
         const messages = [
-            {
-                role: 'system',
-                content: systemPrompt
-            },
+            { role: 'system', content: systemPrompt },
             ...this._conversationHistory.slice(-8).map(msg => ({
                 role: msg.role,
                 content: msg.content
-            }))
+            })),
+            { role: 'user', content: message }
         ];
-        
-        const response = await client.post('/chat/completions', {
-            model: model,
-            messages: messages,
-            max_tokens: 4000,
-            temperature: 0.7,
-            stream: false
-        });
-        
-        return response.data.choices[0].message.content;
+
+        const client = new DeepSeekClient(apiKey, model);
+        return await client.chatCompletion(messages);
     }
     
     _showTypingIndicator() {
