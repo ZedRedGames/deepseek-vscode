@@ -600,9 +600,37 @@ class DeepSeekChatProvider {
                     font-size: 11px;
                     color: var(--vscode-descriptionForeground);
                 }
+                .topbar {
+                    width: 100%;
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    background: #f6f8fa;
+                    border-bottom: 1px solid #d0d7de;
+                    padding: 6px 10px 2px 10px;
+                    gap: 8px;
+                }
+                .topbar-btn {
+                    background: none;
+                    border: none;
+                    color: #888;
+                    font-size: 18px;
+                    cursor: pointer;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    transition: background 0.15s;
+                }
+                .topbar-btn:hover {
+                    background: #eaecef;
+                    color: #222;
+                }
             </style>
         </head>
         <body>
+            <div class="topbar">
+                <button class="topbar-btn" id="settingsBtn" title="Настройки">⚙️</button>
+                <button class="topbar-btn" id="closeBtn" title="Закрыть">✖</button>
+            </div>
             <div class="chat-container">
                 <div class="chat-header">
                     <div class="header-title">
@@ -815,6 +843,20 @@ class DeepSeekChatProvider {
                 
                 // Инициализация
                 updateSendButton();
+
+                // Добавим обработчики для кнопок topbar
+                const closeBtn = document.getElementById('closeBtn');
+                const settingsBtn = document.getElementById('settingsBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        vscode.postMessage({ type: 'closeSidebar' });
+                    });
+                }
+                if (settingsBtn) {
+                    settingsBtn.addEventListener('click', () => {
+                        vscode.postMessage({ type: 'openSettings' });
+                    });
+                }
             </script>
         </body>
         </html>`;
