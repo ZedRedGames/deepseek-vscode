@@ -191,6 +191,33 @@
           "type": "number",
           "default": 4000,
           "description": "Максимальное количество токенов"
+        },
+        "deepseek.windowPosition": {
+          "type": "string",
+          "default": "right",
+          "description": "Расположение окна расширения (right - справа, left - слева)",
+          "enum": ["right", "left"]
+        },
+        "deepseek.autoScroll": {
+          "type": "boolean",
+          "default": true,
+          "description": "Автоматически прокручивать чат к последнему сообщению"
+        },
+        "deepseek.showWelcome": {
+          "type": "boolean",
+          "default": true,
+          "description": "Показывать приветственное сообщение в чате"
+        },
+        "deepseek.theme": {
+          "type": "string",
+          "default": "auto",
+          "description": "Цветовая схема чата (auto, light, dark)",
+          "enum": ["auto", "light", "dark"]
+        },
+        "deepseek.showFeatures": {
+          "type": "boolean",
+          "default": true,
+          "description": "Показывать список возможностей в пустом чате"
         }
       }
     }

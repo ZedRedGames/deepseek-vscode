@@ -18,6 +18,14 @@ class DeepSeekChatProvider {
     resolveWebviewView(webviewView, context, _token) {
         this._view = webviewView;
 
+        // Получаем настройки
+        const config = vscode.workspace.getConfiguration('deepseek');
+        const windowPosition = config.get('windowPosition', 'right');
+        const autoScroll = config.get('autoScroll', true);
+        const showWelcome = config.get('showWelcome', true);
+        const theme = config.get('theme', 'auto');
+        const showFeatures = config.get('showFeatures', true);
+
         webviewView.webview.options = {
             enableScripts: true,
             localResourceRoots: [
@@ -25,8 +33,14 @@ class DeepSeekChatProvider {
             ]
         };
 
-        // Устанавливаем HTML для webview
-        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+        // Передаем настройки в webview через глобальный JS-объект
+        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, {
+            windowPosition,
+            autoScroll,
+            showWelcome,
+            theme,
+            showFeatures
+        });
 
         // Обработка сообщений от webview (UI)
         webviewView.webview.onDidReceiveMessage(async data => {
@@ -233,7 +247,7 @@ class DeepSeekChatProvider {
     /**
      * Генерирует HTML для webview (UI чата)
      */
-    _getHtmlForWebview(webview) {
+    _getHtmlForWebview(webview, settings = {}) {
         return `
         <!DOCTYPE html>
         <html lang="ru">
@@ -600,30 +614,6 @@ class DeepSeekChatProvider {
                     font-size: 11px;
                     color: var(--vscode-descriptionForeground);
                 }
-                .topbar {
-                    width: 100%;
-                    display: flex;
-                    justify-content: flex-end;
-                    align-items: center;
-                    background: #f6f8fa;
-                    border-bottom: 1px solid #d0d7de;
-                    padding: 6px 10px 2px 10px;
-                    gap: 8px;
-                }
-                .topbar-btn {
-                    background: none;
-                    border: none;
-                    color: #888;
-                    font-size: 18px;
-                    cursor: pointer;
-                    padding: 2px 8px;
-                    border-radius: 4px;
-                    transition: background 0.15s;
-                }
-                .topbar-btn:hover {
-                    background: #eaecef;
-                    color: #222;
-                }
             </style>
         </head>
         <body>
@@ -698,37 +688,42 @@ class DeepSeekChatProvider {
                     }
                 });
                 
-                // Обновление отображения чата
+                // Внутри <script> webview:
+                window.deepseekSettings = window.deepseekSettings || {};
+                const { autoScroll, showWelcome, theme, showFeatures } = window.deepseekSettings;
+
+                // Применяем тему
+                if (theme && theme !== 'auto') {
+                    document.body.classList.add('theme-' + theme);
+                }
+
+                // Автоскролл
+                function scrollToBottom() {
+                    if (autoScroll !== false && chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+
+                // Модифицируем updateChatDisplay для showWelcome/showFeatures
                 function updateChatDisplay(history) {
                     chatMessages.innerHTML = '';
-                    
-                    if (history.length === 0) {
+                    if (history.length === 0 && showWelcome !== false) {
                         chatMessages.innerHTML = \`
                             <div class="empty-state">
                                 <div class="empty-icon">D</div>
                                 <h3>Добро пожаловать в DeepSeek Chat!</h3>
-                                <p>Я ваш AI-помощник для программирования. Могу помочь с:</p>
+                                <p>Я ваш AI-помощник для программирования.</p>
+                                ${showFeatures !== false ? `<p>Могу помочь с:</p>
                                 <div class="features-grid">
-                                    <div class="feature-item">
-                                        <div class="feature-icon">📖</div>
-                                        <div class="feature-text">Объяснение кода</div>
-                                    </div>
-                                    <div class="feature-item">
-                                        <div class="feature-icon">✨</div>
-                                        <div class="feature-text">Генерация кода</div>
-                                    </div>
-                                    <div class="feature-item">
-                                        <div class="feature-icon">🔧</div>
-                                        <div class="feature-text">Рефакторинг</div>
-                                    </div>
-                                    <div class="feature-item">
-                                        <div class="feature-icon">🐛</div>
-                                        <div class="feature-text">Отладка</div>
-                                    </div>
-                                </div>
+                                    <div class="feature-item"><div class="feature-icon">📖</div><div class="feature-text">Объяснение кода</div></div>
+                                    <div class="feature-item"><div class="feature-icon">✨</div><div class="feature-text">Генерация кода</div></div>
+                                    <div class="feature-item"><div class="feature-icon">🔧</div><div class="feature-text">Рефакторинг</div></div>
+                                    <div class="feature-item"><div class="feature-icon">🐛</div><div class="feature-text">Отладка</div></div>
+                                </div>` : ''}
                                 <p class="start-hint">Начните общение, задав вопрос или выделив код!</p>
                             </div>
                         \`;
+                        scrollToBottom();
                         return;
                     }
                     
@@ -773,7 +768,7 @@ class DeepSeekChatProvider {
                         chatMessages.appendChild(messageDiv);
                     });
                     
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    scrollToBottom();
                     updateSendButton();
                 }
                 
@@ -843,20 +838,6 @@ class DeepSeekChatProvider {
                 
                 // Инициализация
                 updateSendButton();
-
-                // Добавим обработчики для кнопок topbar
-                const closeBtn = document.getElementById('closeBtn');
-                const settingsBtn = document.getElementById('settingsBtn');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', () => {
-                        vscode.postMessage({ type: 'closeSidebar' });
-                    });
-                }
-                if (settingsBtn) {
-                    settingsBtn.addEventListener('click', () => {
-                        vscode.postMessage({ type: 'openSettings' });
-                    });
-                }
             </script>
         </body>
         </html>`;
