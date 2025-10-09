@@ -1,6 +1,9 @@
 const vscode = require("vscode");
 const DeepSeekChatProvider = require("./src/chat-provider");
 const DeepSeekCodeAssistant = require("./src/code-assistant");
+const fs = require('fs');
+const path = require('path');
+const MarkdownIt = require('markdown-it');
 
 function activate(context) {
   console.log("DeepSeek Chat расширение активировано");
@@ -98,6 +101,52 @@ function activate(context) {
     }
   );
 
+  // Провайдер для отображения README.md
+  class DeepSeekReadmeProvider {
+    resolveWebviewView(webviewView, context, _token) {
+      const md = new MarkdownIt();
+      const readmePath = path.join(__dirname, 'README.md');
+      let readmeContent = '';
+      try {
+        readmeContent = fs.readFileSync(readmePath, 'utf8');
+      } catch (e) {
+        readmeContent = 'README.md не найден.';
+      }
+      const html = md.render(readmeContent);
+      webviewView.webview.options = { enableScripts: false };
+      webviewView.webview.html = `
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; background: #fff; color: #222; }
+            h1, h2, h3 { color: #00A8CC; }
+            img { max-width: 100%; border-radius: 8px; }
+            pre { background: #f6f8fa; padding: 12px; border-radius: 8px; overflow-x: auto; }
+            code { background: #f1f3f4; padding: 2px 6px; border-radius: 4px; }
+            a { color: #00A8CC; }
+          </style>
+        </head>
+        <body>${html}</body>
+        </html>
+      `;
+    }
+  }
+
+  // Регистрируем провайдер для README
+  const readmeProviderRegistration = vscode.window.registerWebviewViewProvider(
+    'deepseek-readme-view',
+    new DeepSeekReadmeProvider()
+  );
+
+  // Команда для открытия вкладки README
+  const openReadmeCommand = vscode.commands.registerCommand(
+    'deepseek.openReadme',
+    () => {
+      vscode.commands.executeCommand('workbench.view.extension.deepseek-readme-view');
+    }
+  );
+
   // Подписываемся на все команды
   context.subscriptions.push(
     providerRegistration,
@@ -109,7 +158,9 @@ function activate(context) {
     debugCodeCommand,
     optimizeCodeCommand,
     documentCodeCommand,
-    translateCodeCommand
+    translateCodeCommand,
+    readmeProviderRegistration,
+    openReadmeCommand
   );
 
   // Показываем приветственное сообщение

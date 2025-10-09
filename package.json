@@ -64,6 +64,11 @@
         "command": "deepseek.translateCode",
         "title": "DeepSeek: Перевести код",
         "category": "AI"
+      },
+      {
+        "command": "deepseek.openReadme",
+        "title": "DeepSeek: Открыть README",
+        "category": "AI"
       }
     ],
     "menus": {
@@ -99,6 +104,10 @@
         {
           "command": "deepseek.translateCode",
           "when": "editorHasSelection"
+        },
+        {
+          "command": "deepseek.openReadme",
+          "when": "true"
         }
       ],
       "editor/context": [
@@ -140,6 +149,11 @@
           "id": "deepseek-chat-container",
           "title": "DeepSeek Chat",
           "icon": "media/icon.png"
+        },
+        {
+          "id": "deepseek-readme-container",
+          "title": "DeepSeek README",
+          "icon": "media/icon.png"
         }
       ]
     },
@@ -148,6 +162,12 @@
         {
           "id": "deepseek-chat-view",
           "name": "Чат AI"
+        }
+      ],
+      "deepseek-readme-container": [
+        {
+          "id": "deepseek-readme-view",
+          "name": "README"
         }
       ]
     },
