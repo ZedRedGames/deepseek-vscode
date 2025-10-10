@@ -2,7 +2,7 @@
   "name": "deepseek-chat",
   "displayName": "DeepSeek Chat - Русская версия",
   "description": "Продвинутый AI-помощник DeepSeek для VS Code",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "engines": {
     "vscode": "^1.90.0"
