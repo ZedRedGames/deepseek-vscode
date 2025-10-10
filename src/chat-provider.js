@@ -55,6 +55,14 @@ class DeepSeekChatProvider {
                 case 'insertCode':
                     await this._insertCodeToEditor(data.value);
                     break;
+                case 'closeSidebar':
+                    // Закрываем боковую панель VS Code
+                    vscode.commands.executeCommand('workbench.action.closeSidebar');
+                    break;
+                case 'openSettings':
+                    // Открываем настройки расширения
+                    vscode.commands.executeCommand('workbench.action.openSettings', 'deepseek');
+                    break;
             }
         });
     }
@@ -618,6 +626,12 @@ class DeepSeekChatProvider {
         </head>
         <body>
             <div class="topbar">
+                <button class="topbar-btn" id="newChatBtn" title="Новый чат">🆕</button>
+                <button class="topbar-btn" id="copyBtn" title="Копировать последние ответы">📋</button>
+                <button class="topbar-btn" id="exportBtn" title="Экспорт истории в файл">💾</button>
+                <button class="topbar-btn" id="refreshBtn" title="Обновить">🔄</button>
+                <button class="topbar-btn" id="readmeBtn" title="Открыть README">📖</button>
+                <span style="flex:1"></span>
                 <button class="topbar-btn" id="settingsBtn" title="Настройки">⚙️</button>
                 <button class="topbar-btn" id="closeBtn" title="Закрыть">✖</button>
             </div>
@@ -671,6 +685,13 @@ class DeepSeekChatProvider {
                 const clearBtn = document.getElementById('clearBtn');
                 const typingIndicator = document.getElementById('typingIndicator');
                 const statusInfo = document.getElementById('statusInfo');
+                const closeBtn = document.getElementById('closeBtn');
+                const settingsBtn = document.getElementById('settingsBtn');
+                const newChatBtn = document.getElementById('newChatBtn');
+                const copyBtn = document.getElementById('copyBtn');
+                const exportBtn = document.getElementById('exportBtn');
+                const refreshBtn = document.getElementById('refreshBtn');
+                const readmeBtn = document.getElementById('readmeBtn');
                 
                 // Обработчик сообщений от расширения
                 window.addEventListener('message', event => {
@@ -687,6 +708,43 @@ class DeepSeekChatProvider {
                             break;
                     }
                 });
+
+                // Кнопки верхней панели
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        vscode.postMessage({ type: 'closeSidebar' });
+                    });
+                }
+                if (settingsBtn) {
+                    settingsBtn.addEventListener('click', () => {
+                        vscode.postMessage({ type: 'openSettings' });
+                    });
+                }
+                if (newChatBtn) {
+                    newChatBtn.addEventListener('click', () => {
+                        vscode.postMessage({ type: 'newChat' });
+                    });
+                }
+                if (copyBtn) {
+                    copyBtn.addEventListener('click', () => {
+                        vscode.postMessage({ type: 'copyChat' });
+                    });
+                }
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', () => {
+                        vscode.postMessage({ type: 'exportChat' });
+                    });
+                }
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', () => {
+                        vscode.postMessage({ type: 'refreshChat' });
+                    });
+                }
+                if (readmeBtn) {
+                    readmeBtn.addEventListener('click', () => {
+                        vscode.postMessage({ type: 'openReadmeView' });
+                    });
+                }
                 
                 // Внутри <script> webview:
                 window.deepseekSettings = window.deepseekSettings || {};

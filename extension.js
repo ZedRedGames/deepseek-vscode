@@ -25,9 +25,25 @@ function activate(context) {
   // Команда для открытия чата
   const openChatCommand = vscode.commands.registerCommand(
     "deepseek.openChat",
-    () => {
+    async () => {
+      // Применяем настройку расположения боковой панели
+      try {
+        const cfg = vscode.workspace.getConfiguration('deepseek');
+        const desired = cfg.get('windowPosition', 'right'); // 'right' | 'left'
+        const workbenchCfg = vscode.workspace.getConfiguration('workbench');
+        const current = workbenchCfg.get('sideBar.location');
+        if (desired === 'right' && current !== 'right') {
+          await workbenchCfg.update('sideBar.location', 'right', vscode.ConfigurationTarget.Global);
+        } else if (desired === 'left' && current !== 'left') {
+          await workbenchCfg.update('sideBar.location', 'left', vscode.ConfigurationTarget.Global);
+        }
+      } catch {}
+
       // Создаем и показываем панель чата
       provider.showChatPanel();
+      // Явно раскрываем контейнер и view чата
+      vscode.commands.executeCommand('workbench.view.extension.deepseek-chat-container');
+      vscode.commands.executeCommand('workbench.view.extension.deepseek-chat-view');
       vscode.window.showInformationMessage("DeepSeek Чат открыт! Начните общение с AI.");
     }
   );
