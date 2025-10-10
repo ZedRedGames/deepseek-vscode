@@ -18,6 +18,21 @@
     "Other"
   ],
   "main": "./extension.js",
+  "activationEvents": [
+    "onCommand:deepseek.openChat",
+    "onCommand:deepseek.quickChat",
+    "onCommand:deepseek.explainCode",
+    "onCommand:deepseek.generateCode",
+    "onCommand:deepseek.refactorCode",
+    "onCommand:deepseek.debugCode",
+    "onCommand:deepseek.optimizeCode",
+    "onCommand:deepseek.documentCode",
+    "onCommand:deepseek.translateCode",
+    "onCommand:deepseek.openReadme",
+    "onView:deepseek-chat-view",
+    "onView:deepseek-readme-view",
+    "onStartupFinished"
+  ],
   "contributes": {
     "commands": [
       {
