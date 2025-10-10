@@ -63,6 +63,42 @@ class DeepSeekChatProvider {
                     // Открываем настройки расширения
                     vscode.commands.executeCommand('workbench.action.openSettings', 'deepseek');
                     break;
+                case 'newChat':
+                    this._conversationHistory = [];
+                    this._updateWebview();
+                    vscode.window.showInformationMessage('Начат новый чат');
+                    break;
+                case 'copyChat':
+                    try {
+                        const plain = this._conversationHistory.map(m => `${m.role === 'user' ? 'Вы' : 'DeepSeek'}: ${m.content}`).join('\n\n');
+                        await vscode.env.clipboard.writeText(plain);
+                        vscode.window.showInformationMessage('История чата скопирована в буфер обмена');
+                    } catch (e) {
+                        vscode.window.showErrorMessage('Не удалось скопировать историю чата');
+                    }
+                    break;
+                case 'exportChat':
+                    try {
+                        const uri = await vscode.window.showSaveDialog({
+                            filters: { 'Markdown': ['md'], 'Text': ['txt'] },
+                            saveLabel: 'Сохранить историю чата'
+                        });
+                        if (uri) {
+                            const md = this._conversationHistory.map(m => `**${m.role === 'user' ? 'Вы' : 'DeepSeek'}**: ${m.content}`).join('\n\n');
+                            await vscode.workspace.fs.writeFile(uri, Buffer.from(md, 'utf8'));
+                            vscode.window.showInformationMessage('История чата сохранена');
+                        }
+                    } catch (e) {
+                        vscode.window.showErrorMessage('Не удалось сохранить историю чата');
+                    }
+                    break;
+                case 'refreshChat':
+                    this._updateWebview();
+                    break;
+                case 'openReadmeView':
+                    vscode.commands.executeCommand('workbench.view.extension.deepseek-readme-container');
+                    vscode.commands.executeCommand('workbench.view.extension.deepseek-readme-view');
+                    break;
             }
         });
     }
